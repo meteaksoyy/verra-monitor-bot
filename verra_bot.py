@@ -8,8 +8,12 @@ PASSWORD = os.environ["BOT_PASSWORD"]
 TO_EMAIL = os.environ["BOT_TO"]
 
 def fetch_ids():
-  data = requests.get(API_URL).json()
-  return [item["id"] for item in data]
+
+  url = "https://www.verra.nl/en/realtime-listings/consumer"
+  data = requests.get(url).json
+  print("DEBUG JSON:")
+  print(json.dumps(data[:2], indent = 2))
+  return []
 
 def notify(msg):
   server = smtplib.SMTP("smtp.gmail.com", 587)
