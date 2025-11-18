@@ -12,33 +12,14 @@ PASSWORD = os.environ["BOT_PASSWORD"]
 TO_EMAIL = os.environ["BOT_TO"]
 
 def fetch_ids():
-    url = "https://www.verra.nl/en/listings"
-    html = requests.get(url).text
-
-    # Debug raw HTML
-    print("DEBUG RAW HTML:")
-    print(html[:1500])
-
-    soup = BeautifulSoup(html, "html.parser")
-
-    script_tag = soup.find("script", {"class": "realtime-listings-json"})
-
-    if not script_tag:
-        print("ERROR: Could not find JSON script tag")
-        return []
-
     try:
-        data = json.loads(script_tag.text)
-        print("DEBUG JSON:")
-        print(json.dumps(data, indent=2)[:1500])
+        data = requests.get(API_URL, timeout=10).json()
     except Exception as e:
-        print("JSON PARSE ERROR:", e)
+        print("ERROR FETCHING JSON:", e)
         return []
 
-    # now data is a list of listing objects
-    ids = [item["id"] for item in data]
-
-    return ids
+    print("DEBUG JSON SAMPLE:", data[:2])   # print first items
+    return [item["id"] for item in data]
 
 def notify(msg):
   server = smtplib.SMTP("smtp.gmail.com", 587)
