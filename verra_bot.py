@@ -12,7 +12,7 @@ def fetch_ids():
   url = "https://www.verra.nl/en/realtime-listings/consumer"
   data = requests.get(url).json
   print("DEBUG JSON:")
-  print(json.dumps(data[:2], indent = 2))
+  print(json.dumps(data[:2], indent = 2)[:2000])
   return []
 
 def notify(msg):
