@@ -1,4 +1,8 @@
-import requests, json, smtplib, os
+import requests
+import json
+import smtplib
+import os
+from bs4 import BeautifulSoup
 
 API_URL = "https://www.verra.nl/en/realtime-listings/consumer"
 CACHE_FILE = "cache.json"
