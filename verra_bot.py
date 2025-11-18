@@ -19,7 +19,7 @@ def fetch_ids():
         return []
 
     print("DEBUG JSON SAMPLE:", data[:2])   # print first items
-    return [item["id"] for item in data]
+    return [item["_id"] for item in data]
 
 def notify(msg):
   server = smtplib.SMTP("smtp.gmail.com", 587)
