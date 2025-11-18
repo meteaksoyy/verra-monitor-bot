@@ -29,6 +29,7 @@ jobs:
           BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
           BOT_TO: ${{ secrets.BOT_TO }}
+          BOT_TO_2: ${{ secrets.BOT_TO_2 }}
         run: python verra_bot.py
 
       - name: Save updated cache
