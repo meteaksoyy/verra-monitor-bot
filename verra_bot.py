@@ -27,7 +27,7 @@ def fetch_ids():
         and item.get("isRentals") == True
     ]
     
-    return [item["_id"] for item in filtered]
+    return filtered
 
 def notify(msg):
     email_text = f"Subject: Verra Bot Alert\n\n{msg}"
@@ -47,9 +47,13 @@ except:
     old_ids = []
 
 new_ids = fetch_ids()
-added = [i for i in new_ids if i not in old_ids]
+new_item_ids = [item["_id"] for item in new_ids]
+added = [item for item in new_ids if item["_id"] not in old_ids]
 
 if added:
-    notify(f"NEW LISTING APPLY RIGHT NOW :) : {added}")
+    text = "New Verra Makelaars listing in Delft:\n\n"
+    for item in added:
+        text+= f"- {item.get('address','Unknown address')} (ID : {item['_id']})\n"
+    notify(text)
 
 json.dump(new_ids, open(CACHE_FILE, "w"))
