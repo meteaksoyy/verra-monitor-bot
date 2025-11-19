@@ -32,7 +32,7 @@ def fetch_ids():
     and isinstance(item.get("totalRent"), (int, float))
     and item.get("totalRent") > 100
   ]
-  return [item["id"] for item in filtered]
+  return filtered
 
 def notify(msg):
   recipients = [TO_1, TO_2]
@@ -46,10 +46,16 @@ try:
 except:
   old_ids = []
 
-new_ids = fetch_ids()
-added = [i for i in new_ids if i not in old_ids]
+new_items = fetch_ids()
+new_ids = [item["id"] for item in new_items]
+added = [item for item in new_items if item["id"] not in old_ids]
 if added:
-  notify(f"NEW PLAZA LISTINGS IN DELFT:\n{added}")
+  lines = []
+  for item in added:
+    address = f"{item.get('street', '')} {item.get('houseNumber', '')} {item.get('houseNumberAddition', '')}".strip()
+    lines.append(f"- {address} (ID: {item['id']})")
+    msg = "New Plaza Listings in Delft:\n\n" + "\n".join(lines)
+  notify(msg)
 
 json.dump(new_ids, open(CACHE_FILE, "w"))
   
