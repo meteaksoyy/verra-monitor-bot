@@ -56,4 +56,4 @@ if added:
         text+= f"- {item.get('address','Unknown address')} (ID : {item['_id']})\n"
     notify(text)
 
-json.dump(new_ids, open(CACHE_FILE, "w"))
+json.dump(new_item_ids, open(CACHE_FILE, "w"))
