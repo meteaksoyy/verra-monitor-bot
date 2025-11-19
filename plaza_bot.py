@@ -37,7 +37,7 @@ def notify(msg):
   server = smtplib.SMTP("smtp.gmail.com", 587)
   server.starttls()
   server.login(EMAIL, PASSWORD)
-  server.sendemail(EMAIL, recipients, msg)
+  server.sendmail(EMAIL, recipients, msg)
 
 try:
   old_ids = json.load(open(CACHE_FILE))
