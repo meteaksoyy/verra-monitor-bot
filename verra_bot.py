@@ -20,7 +20,14 @@ def fetch_ids():
         return []
 
     print("DEBUG JSON SAMPLE:", data[:2])   # print first items
-    return [item["_id"] for item in data]
+
+    filtered = [
+        item for item in data
+        if item.get("city") == "Delft"
+        and item.get("isRentals") == True
+    ]
+    
+    return [item["_id"] for item in filtered]
 
 def notify(msg):
     email_text = f"Subject: Verra Bot Alert\n\n{msg}"
