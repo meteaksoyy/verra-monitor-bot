@@ -48,5 +48,6 @@ new_ids = fetch_ids()
 added = [i for i in new_ids if i not in old_ids]
 if added:
   notify(f"NEW PLAZA LISTINGS IN DELFT:\n{added}")
-  json.dump(new_ids, open(CACHE_FILE, "w"))
+
+json.dump(new_ids, open(CACHE_FILE, "w"))
   
