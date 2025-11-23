@@ -1,8 +1,8 @@
-name: Monitor Bot
+name: Auto Apply Bot
 
 on:
   schedule:
-    - cron: "*/10 * * * *" # check every 10 minutes
+    - cron: "*/50 * * * *" # check every 50 minutes
   workflow_dispatch:       # manual run
 
 jobs:
