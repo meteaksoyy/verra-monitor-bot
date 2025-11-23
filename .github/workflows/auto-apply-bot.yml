@@ -22,7 +22,7 @@ jobs:
 
       - name: Load previous caches
         run: | 
-          if [ ! -f plaza_cache_auto.json]; then echo "[]" > plaza_cache_auto.json; fi
+          if [ ! -f plaza_cache_auto.json ]; then echo "[]" > plaza_cache_auto.json; fi
 
       - name: Run Auto Plaza bot
         env: 
