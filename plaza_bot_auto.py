@@ -66,7 +66,7 @@ def login(session: requests.Session):
       "Content-Type": "application/json",
       "Origin": "https://plaza.newnewnew.space",
       "Referer": "https://plaza.newnewnew.space/",
-  }
+  })
   payload = {
     "client_id": "wzp",
     "grant_type": "password",
