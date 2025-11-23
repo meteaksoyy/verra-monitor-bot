@@ -16,7 +16,7 @@ PLAZA_USERNAME = os.environ["PLAZA_USERNAME"]
 PLAZA_PASSWORD = os.environ["PLAZA_PASSWORD"]
 
 PLAZA_BASE = "https://plaza.newnewnew.space"
-LOGIN_URL = f"{PLAZA_BASE}/portaal/account/frontend/loginservice/format/json"
+LOGIN_URL = f"{PLAZA_BASE}/portaal/proxy/frontend/api/v1/oauth/token"
 APPLY_URL = f"{PLAZA_BASE}/portaal/object/frontend/react/format/json"
 
 
