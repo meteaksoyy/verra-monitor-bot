@@ -60,6 +60,11 @@ def fetch_ids():
 # LOGIN
 # ------------------------------------------------
 def login(session: requests.Session):
+  session.headers.update({
+    "User-Agent": "Mozilla/5.0",
+    "X-Requested-With": "XMLHttpRequest",
+    "Content-Type": "application/json"
+  })
   payload = {
     "client_id": "wzp",
     "grant_type": "password",
