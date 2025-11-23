@@ -83,32 +83,43 @@ def login(session: requests.Session):
 # ---------------------------------------------------
 # GET HIDDEN FORM FIELDS
 # ---------------------------------------------------
-def fetch_form_fields(session):
-  r = session.get(FORM_URL)
-  print("DEBUG FORM HTML:\n", r.text[:2000])
+def fetch_metadata(session):
+  r = session.get(META_URL)
   if r.status_code != 200:
-    raise Exception("Failed to load ReageerForm.html")
-  soup = BeautifulSoup(r.text, "html.parser")
-  form = soup.find("form", attr={"name": "reactForm"})
-  if not form:
-    raise Exception("reactForm not found in ReageerForm.html")
-  fields = {}
+    raise Exception("Metadata fetch failed")
 
-  for inp in form.find_all("input"):
-    name = inp.get("name")
-    if name:
-      fields[name] = inp.get("value","")
+  data = r.json()
 
-  required = ["__id__", "__hash__", "add", "dwellingID"]
-  for key in required:
-    if key not in fields:
-      raise Exception(f"Missing required field: {key}")
-  return fields
+  if "elements" not in data or "reactionData" not in data:
+    raise Exception("Invalid metadata format")
+  
+  elements = data["elements"]
+  __id__ = elements.get("__id__", "")
+  __hash__ = elements.get("__hash__", "")
+  genderId = elements.get("genderId", "")
+  
+  url_params = data["reactionData"].get("url", "")
+  
+  url_params = url_params.lstrip("?")
+  parts = dict(pair.split("=") for pair in url_params.split("&"))
+  add = parts.get("add")
+  dwellingID = parts.get("dwellingID")
+  if not add or not dwellingID:
+    raise Exception("Missing add/dwellingID in metadata")
+  return {
+    "__id__": __id__,
+    "__hash__": __hash__,
+    "genderId": genderId,
+    "add": add,
+    "dwellingID": dwellingID,
+    "reactieMotivatie": ""
+  }
+
 # ---------
 # APPLY
 # ---------
-def apply_to_listing(session, fields):
-  r = session.post(APPLY_URL, json=fields)
+def apply_to_listing(session, body):
+  r = session.post(APPLY_URL, json=body)
   if r.status_code != 200:
     raise Exception(f"Apply failed {r.status_code} {r.text}")
   return r.json()
@@ -128,27 +139,24 @@ added = [item for item in new_items if item["id"] not in old_ids]
 
 if added:
   with requests.Session() as session:
-    session.headers.update({"User-Agent": "Mozilla/5.0"})
     login(session)
-
-    
     try:
-      form_fields = fetch_form_fields(session)
+      base_metadata = fetch_metadata(session)
     except Exception as e:
-      notify(f"Failed loading apply form fields: {e}")
+      notify(f"Metadata fetch error: {e}")
       raise e
 
     
     msg_lines = []
     for item in added:
-      dwelling_id = str(item["id"])
-      form_fields["dwellingID"] = dwelling_id
+      meta = base_metadata.copy()
+      meta["dwellingID"] = str(item["id"])
       
       address = f"{item.get('street', '')} {item.get('houseNumber','')} {item.get('houseNumberAddition', '')}".strip()
       url_key = item.get("urlKey", "")
       detail_url = f"{PLAZA_BASE}/en/availables-places/living-place/details/{url_key}"
       try:
-        apply_result = apply_to_listing(session, form_fields)
+        apply_result = apply_to_listing(session, meta)
         apply_msg = f"Applied successfully: {apply_result}"
       except Exception as e:
         apply_msg = f"Apply failed: {e}"
