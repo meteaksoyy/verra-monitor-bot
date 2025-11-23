@@ -84,6 +84,7 @@ def login(session: requests.Session):
 # ---------------------------------------------------
 def fetch_form_fields(session):
   r = session.get(FORM_URL)
+  print("DEBUG FORM HTML:\n", r.text[:2000])
   if r.status_code != 200:
     raise Exception("Failed to load ReageerForm.html")
   soup = BeautifulSoup(r.text, "html.parser")
