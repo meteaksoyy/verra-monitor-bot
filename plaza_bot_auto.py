@@ -63,7 +63,7 @@ def login(session: requests.Session):
   session.headers.update({
       "User-Agent": "Mozilla/5.0",
       "Accept": "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/json",
       "Origin": "https://plaza.newnewnew.space",
       "Referer": "https://plaza.newnewnew.space/",
   })
@@ -73,7 +73,7 @@ def login(session: requests.Session):
     "username": PLAZA_USERNAME,
     "password": PLAZA_PASSWORD
   }
-  r = session.post(LOGIN_URL, data=payload)
+  r = session.post(LOGIN_URL, json=payload)
   if r.status_code != 200:
     raise Exception(f"Login failed: {r.status_code} {r.text}")
   return True
