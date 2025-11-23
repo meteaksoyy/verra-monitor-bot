@@ -81,25 +81,25 @@ def login(session: requests.Session):
 # ---------------------------------------------------
 # GET HIDDEN FORM FIELDS
 # ---------------------------------------------------
-def fetch_form_fields(session: requests.Session, url: str):
-  r = session.get(url)
+def fetch_metadata(session: requests.Session, dwelling_id: str):
+  meta_url = (
+    "https://plaza.newnewnew.space/portal/object/frontend/react/format/json"
+    f"?dwellingID={dwelling_id}&action=reageren"
+  )
+  r = session.get(meta_url)
   if r.status_code != 200:
-    raise Exception(f"Detail page load failed: {r.status_code}")
-  soup = BeautifulSoup(r.text, "html.parser")
-  form = soup.find("form", attrs={"name": "reactForm"})
-  if not form:
-    raise Exception("Apply form not found - is the form correct?")
-  fields = {}
-  for inp in form.find_all("input"):
-    name = inp.get("name")
-    val = inp.get("value") or ""
-    if name:
-      fields[name] = val
-  required = ["__id__", "__hash__", "add", "dwellingID"]
-  for k in required:
-    if k not in fields:
-      raise Exception(f"Missing required form field: {k}")
-  return fields
+    raise Exception(f"Metadata fetch failed {r.status_code}")
+  data = r.json()
+
+  if "initialValues" not in data:
+    raise Exception("Missing initialValues in metadata JSON")
+
+vals = data["initialValues"]
+required = ["__id__", "__hash__", "add", "dwellingID"]
+for k in required:
+  if k not in vals:
+    raise Exception(f"Missing required field in metadata: {k}")
+return vals
 
 # ---------
 # APPLY
@@ -125,12 +125,13 @@ if added:
     login(session)
     msg_lines = []
     for item in added:
+      dwelling_id = str(item["id"])
       address = f"{item.get('street', '')} {item.get('houseNumber','')} {item.get('houseNumberAddition', '')}".strip()
       url_key = item.get("urlKey", "")
       detail_url = f"{PLAZA_BASE}/en/availables-places/living-place/details/{url_key}"
       try:
-        fields = fetch_form_fields(session, detail_url)
-        apply_result = apply_to_listing(session, fields)
+        meta = fetch_metadata(session, dwelling_id)
+        apply_result = apply_to_listing(session, meta)
         apply_msg = f"Applied successfully: {apply_result}"
       except Exception as e:
         apply_msg = f"Apply failed: {e}"
