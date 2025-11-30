@@ -123,16 +123,7 @@ def login(driver):
     print("Found host for submit")
     submit_shadow = expand_shadow(driver, submit_host)
     print("Found shadow root for submit")
-    # Try for up to 10 seconds to find the real button inside the shadow root
-    submit_btn = None
-    for _ in range(100):   # 100 × 0.1s = 10 seconds
-        try:
-            submit_btn = submit_shadow.find_element(By.CSS_SELECTOR, "button")
-            break
-        except:
-            time.sleep(0.1)
-    if submit_btn is None:
-        raise Exception("Submit button not found inside shadow root")
+    submit_btn = submit_shadow.find_element(By.CSS_SELECTOR, "zds-button")
     submit_btn.click()
     print("Clicked login submit")
 
