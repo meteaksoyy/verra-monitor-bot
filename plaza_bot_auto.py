@@ -77,6 +77,9 @@ def create_driver():
 
     return webdriver.Chrome(options=opts)
 
+def find_in_shadow(driver, element, selector):
+    return driver.execute.script("return arguments[0].shadowRoot.querySelector(arguments[1])", element, selector)
+
 # -------------------------------------------------------------
 # LOGIN
 # -------------------------------------------------------------
@@ -84,60 +87,46 @@ def login(driver):
     print("DEBUG: Opening home page…")
     driver.get("https://plaza.newnewnew.space/")
     time.sleep(2)
-    print("DEBUG: Page title =", driver.title)
-    print("DEBUG: Clicking login button…")
-    # Try dismissing cookie banner
-    try:
-        accept_btn = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))
-        )
-        accept_btn.click()
-        print("DEBUG: Cookie banner dismissed")
-    except:
-        pass  # No cookie banner
-        
-    try:
-        login_btn = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen') or contains(., 'Login')]")))
-        login_btn.click()
-    except:
-        try:
-            menu_btn = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.menu-toggle, .menu-toggle")))
-            menu_btn.click()
-            print("found menu_btn")
-            time.sleep(1)
-            login_btn = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen') or contains(., 'Login')]")))
-            login_btn.click()
-        except Exception as e:
-            print("DEBUG ERROR: Could not click login button:", e)
-            driver.save_screenshot("debug_no_login_button.png")
-            raise
-        time.sleep(2)
-        print("DEBUG: Current URL after clicking =", driver.current_url)
 
-    # DEBUG: Dump page HTML to inspect
-    html = driver.page_source
-    open("debug_login_html.html", "w", encoding="utf-8").write(html)
-    print("DEBUG: Saved page to debug_login_html.html")
+    print("DEBUG: Locating shadow host…")
 
-    try:
-        user_field = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]")))
-    except Exception as e:
-        print("DEBUG ERROR: Username field not found:", e)
-        driver.save_screenshot("debug_no_username_field.png")
-        raise
-    user_field.send_keys(PLAZA_USERNAME)
+    # Step 1 — locate the shadow host
+    host = WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "zds-navigation-body.login-plugin-container"))
+    )
+
+    print("DEBUG: Expanding shadow root…")
+    shadow = driver.execute_script("return arguments[0].shadowRoot", host)
+    if shadow is None:
+        raise Exception("Shadow root is NULL")
+
+    print("DEBUG: Searching for internal login link…")
+
+    # Step 2 — find <a> or <div> inside the shadow root
+    login_el = driver.execute_script("""
+        return arguments[0].querySelector('zds-navigation-link a, zds-navigation-link div, a.navigation-link');
+    """, shadow)
+
+    if not login_el:
+        driver.save_screenshot("debug_no_login_element.png")
+        raise Exception("Could not find login element inside shadow root")
+
+    print("DEBUG: Clicking login element…")
+    driver.execute_script("arguments[0].click();", login_el)
+    time.sleep(1)
+
+    print("DEBUG: Waiting for login fields…")
+
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.NAME, "tx_felogin_pi1[username]"))
+    )
+
+    driver.find_element(By.NAME, "tx_felogin_pi1[username]").send_keys(PLAZA_USERNAME)
     driver.find_element(By.NAME, "tx_felogin_pi1[password]").send_keys(PLAZA_PASSWORD)
     driver.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
 
-    print("DEBUG: Submitted login")
-    try:
-        WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
-    except:
-        print("DEBUG ERROR: Login did not redirect correctly")
-        driver.save_screenshot("debug_login_failed.png")
-        raise
-
-    print("DEBUG: Login SUCCESSFUL. URL =", driver.current_url)
+    print("DEBUG: Login form submitted, waiting for redirect…")
+    WebDriverWait(driver, 20).until(EC.url_contains("portaal"))
 
 
 # -------------------------------------------------------------
