@@ -84,7 +84,7 @@ def expand_shadow(driver, element):
 # -------------------------------------------------------------
 def login(driver):
     driver.get("https://plaza.newnewnew.space/")
-        try:
+    try:
         WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))).click()
         print("DEBUG: Cookie popup dismissed")
     except:
