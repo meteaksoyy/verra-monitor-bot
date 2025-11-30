@@ -128,7 +128,7 @@ def login(driver):
     print("Clicked login submit")
 
     # Wait for redirect
-    WebDriverWait(driver, 25).until(EC.url_contains("portaal"))
+    WebDriverWait(driver, 25).until(EC.url_to_be("https://plaza.newnewnew.space/portaal/mijn-pagina/mijn-overzicht"))
 
 # -------------------------------------------------------------
 # APPLY
