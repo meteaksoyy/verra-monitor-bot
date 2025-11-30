@@ -54,7 +54,6 @@ def fetch_new_listings():
         and isinstance(item.get("totalRent"), (int, float))
         and item.get("totalRent") > 100
     ]
-    print(listings)
     try: 
         old_ids = json.load(open(CACHE_FILE))
     except:
