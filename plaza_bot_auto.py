@@ -120,7 +120,9 @@ def login(driver):
 
     # --- SUBMIT BUTTON ---
     submit_host = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CSS_SELECTOR, "zds-button[type='submit']")))
+    print("Found host for submit")
     submit_shadow = expand_shadow(driver, submit_host)
+    print("Found shadow root for submit")
     submit_btn = submit_shadow.find_element(By.CSS_SELECTOR, "button")
     submit_btn.click()
     print("Clicked login submit")
