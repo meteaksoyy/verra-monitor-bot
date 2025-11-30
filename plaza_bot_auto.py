@@ -83,20 +83,25 @@ def expand_shadow(driver, element):
 # LOGIN
 # -------------------------------------------------------------
 def login(driver):
+    print("DEBUG: Opening home page…")
     driver.get("https://plaza.newnewnew.space/")
+    time.sleep(1)
+    # Accept cookies if present
     try:
-        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))).click()
+        WebDriverWait(driver, 5).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Akkoord') or contains(., 'Agree')]"))).click()
         print("DEBUG: Cookie popup dismissed")
     except:
         pass
-    
-    # Click the INLOGGEN button
-    login_btn = WebDriverWait(driver, 15).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen')]"))
-    )
-    login_btn.click()
-    print("Clicked login button")
-
+    print("DEBUG: Clicking INLOGGEN…")
+    try:
+        login_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[contains(., 'Inloggen')]")))
+        login_btn.click()
+        print("Clicked login button")
+    except Exception as e:
+        print("DEBUG ERROR: Could not click Inloggen:", e)
+        driver.save_screenshot("debug_login_fail.png")
+        raise
     # Fill username
     username_input = WebDriverWait(driver, 15).until(
         EC.element_to_be_clickable((By.XPATH, "//input[@name='username']"))
