@@ -87,14 +87,22 @@ def login(driver):
     print("DEBUG: Page title =", driver.title)
     print("DEBUG: Clicking login button…")
     try:
-        login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href*='inloggen']")))
+        login_btn = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen') or contains(., 'Login')]")))
         login_btn.click()
-    except Exception as e:
-        print("DEBUG ERROR: Could not click login button:", e)
-        driver.save_screenshot("debug_no_login_button.png")
-        raise
-    time.sleep(2)
-    print("DEBUG: Current URL after clicking =", driver.current_url)
+    except:
+        try:
+            menu_btn = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.menu-toggle, .menu-toggle")))
+            menu_btn.click()
+            print("found menu_btn")
+            time.sleep(1)
+            login_btn = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Inloggen') or contains(., 'Login')]")))
+            login_btn.click()
+        except Exception as e:
+            print("DEBUG ERROR: Could not click login button:", e)
+            driver.save_screenshot("debug_no_login_button.png")
+            raise
+        time.sleep(2)
+        print("DEBUG: Current URL after clicking =", driver.current_url)
 
     # DEBUG: Dump page HTML to inspect
     html = driver.page_source
