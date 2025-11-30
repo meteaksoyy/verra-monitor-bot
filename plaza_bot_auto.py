@@ -157,6 +157,7 @@ def apply_to_listing(driver, item):
 def main():
     print("Bot started (loop mode)")
     while True:
+        time.sleep(15) # check every 15 seconds
         try:      
             new_listings = fetch_new_listings()
             if not new_listings:
@@ -183,7 +184,6 @@ def main():
 
         except Exception as e:
             notify(f"Bot crashed: {e}")
-        time.sleep(15) # check every 15 seconds
     
     
 print("Before Main")
