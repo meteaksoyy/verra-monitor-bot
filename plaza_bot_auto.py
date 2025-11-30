@@ -54,7 +54,7 @@ def fetch_new_listings():
         and isinstance(item.get("totalRent"), (int, float))
         and item.get("totalRent") > 100
     ]
-
+    print(listings)
     try: 
         old_ids = json.load(open(CACHE_FILE))
     except:
@@ -121,10 +121,12 @@ def main():
     print("Entered main")
     new_listings = fetch_new_listings()
     if not new_listings:
+        print("No new listings")
         return
     driver = create_driver()
     try:
         login(driver)
+        print("Logged in")
     except Exception as e:
         notify(f"Login failed: {e}")
         driver.quit()
@@ -139,6 +141,7 @@ def main():
             results.append(f"Apply failed for listing {listing_id}: {msg}")
     driver.quit()
     notify("\n".join(results))
+    
 print("Before Main")
 if __name__ == "__main__":
     main()
