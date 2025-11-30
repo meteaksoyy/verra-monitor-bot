@@ -126,9 +126,9 @@ def login(driver):
     print("Found shadow root for submit")
     driver.execute_script("arguments[0].click()", submit_host)
     print("Clicked login submit")
-
+    driver.save_screenshot("after_submit.png")
     # Wait for redirect
-    WebDriverWait(driver, 25).until(EC.url_to_be("https://plaza.newnewnew.space/portaal/mijn-pagina/mijn-overzicht"))
+    WebDriverWait(driver, 25).until(EC.contains("portaal"))
 
 # -------------------------------------------------------------
 # APPLY
